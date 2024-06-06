@@ -1,54 +1,41 @@
-#!/usr/bin/env bash
+tes a file containing its PID in /var/run/my_process.pid
+# Displays manage_my_process started
+# When passing the argument stop:
+# Stops manage_my_process
+# Delete the file /var/run/my_process.pid
+# Displays manage_my_process stopped
+# When passing the argument restsrt
+# Stops manage_my_process
+# Deletes the file /var/run/my_process.pid
+# Starts manage_my_process
+# Creates a file containing its PID in /var/run/my_process.pid
+# Displays manage_my_process restarted
+# Displays Usage: manage_my_process {start|stop|restart} if any other argument or no argument is passed
 
-# This script manages the manage_my_process script with start, stop, and restart commands
-
-PROCESS_NAME="manage_my_process"
-PID_FILE="/var/run/my_process.pid"
-SCRIPT_PATH="/path/to/manage_my_process"  # Change this to the actual path of manage_my_process script
-
-start() {
-    if [ -f "$PID_FILE" ]; then
-        echo "$PROCESS_NAME is already running"
-    else
-        nohup $SCRIPT_PATH > /dev/null 2>&1 &
-        echo $! > $PID_FILE
-        echo "$PROCESS_NAME started"
-    fi
+argv1=$1
+tmpfile="/var/run/my_process.pid"
+startLoop_n_createFile()
+{
+	./manage_my_process &
+	echo "$!" > "$tmpfile"
 }
-
-stop() {
-    if [ -f "$PID_FILE" ]; then
-        kill "$(cat $PID_FILE)"
-        rm -f $PID_FILE
-        echo "$PROCESS_NAME stopped"
-    else
-        echo "$PROCESS_NAME is not running"
-    fi
+killLoop_n_rmFile()
+{
+	#kill "$(cat "$tmpfile")"
+	sudo pkill -f "./manage_my_process"
+	rm "$tmpfile"
 }
-
-restart() {
-    stop
-    start
-    echo "$PROCESS_NAME restarted"
-}
-
-usage() {
-    echo "Usage: $0 {start|stop|restart}"
-    exit 1
-}
-
-case "$1" in
-    start)
-        start
-        ;;
-    stop)
-        stop
-        ;;
-    restart)
-        restart
-        ;;
-    *)
-        usage
-        ;;
+case "$argv1" in
+	start) echo "manage_my_process started"
+		startLoop_n_createFile
+		;;
+	stop) echo "manage_my_process stopped"
+		killLoop_n_rmFile
+		;;
+	restart) echo "manage_my_process restarted"
+		killLoop_n_rmFile
+		startLoop_n_createFile
+		;;
+	*) echo "Usage: manage_my_process {start|stop|restart}"
+		;;
 esac
-
