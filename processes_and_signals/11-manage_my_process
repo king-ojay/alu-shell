@@ -1,37 +1,40 @@
 #!/usr/bin/env bash
-# Manage the manage_my_process program
 
+# This script manages the manage_my_process script with start, stop, and restart commands
+
+PROCESS_NAME="manage_my_process"
 PID_FILE="/var/run/my_process.pid"
-PROGRAM="manage_my_process"
+SCRIPT_PATH="/path/to/manage_my_process"  # Change this to the actual path of manage_my_process script
 
 start() {
     if [ -f "$PID_FILE" ]; then
-        echo "$PROGRAM is already running"
-        return 1
+        echo "$PROCESS_NAME is already running"
+    else
+        nohup $SCRIPT_PATH > /dev/null 2>&1 &
+        echo $! > $PID_FILE
+        echo "$PROCESS_NAME started"
     fi
-
-    "./$PROGRAM" &
-    PROCESS_PID=$!
-    echo "$PROCESS_PID" > "$PID_FILE"
-    echo "$PROGRAM started"
 }
 
 stop() {
-    if [ ! -f "$PID_FILE" ]; then
-        echo "$PROGRAM is not running"
-        return 1
+    if [ -f "$PID_FILE" ]; then
+        kill "$(cat $PID_FILE)"
+        rm -f $PID_FILE
+        echo "$PROCESS_NAME stopped"
+    else
+        echo "$PROCESS_NAME is not running"
     fi
-
-    PID=$(cat "$PID_FILE")
-    kill "$PID"
-    rm "$PID_FILE"
-    echo "$PROGRAM stopped"
 }
 
 restart() {
     stop
     start
-    echo "$PROGRAM restarted"
+    echo "$PROCESS_NAME restarted"
+}
+
+usage() {
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
 }
 
 case "$1" in
@@ -45,7 +48,7 @@ case "$1" in
         restart
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart}"
-        exit 1
+        usage
         ;;
 esac
+
