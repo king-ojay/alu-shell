@@ -1,5 +1,4 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 PID_FILE="/var/run/my_process.pid"
 PROGRAM="manage_my_process"
 
