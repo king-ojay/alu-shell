@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-Creates a file containing its PID in /var/run/my_process.pid
+# creates a file containing its PID in /var/run/my_process.pid
 # Displays manage_my_process started
 # When passing the argument stop:
 # Stops manage_my_process
