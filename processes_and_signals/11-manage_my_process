@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-#manage my process
 while
+#manage my process
 file=/var/run/my_process.pid
 if [ "$1" == "start" ];
 then
